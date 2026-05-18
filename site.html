@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Amethyst Client — премиальный Internal Ghost Client</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            font-family: 'Montserrat', sans-serif;
+            color: #e8e8e8;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --gray-deep: #0a0a0a;
+            --gray-card: #121212;
+            --gray-border: #2a2a2a;
+            --rose-primary: #bc96a0;
+            --rose-soft: #d6b2be;
+            --rose-muted: #9f7e8a;
+            --text-light: #ffffff;
+            --text-secondary: #b8b8b8;
+        }
+
+        .full-width-nav {
+            width: 100%;
+            background: rgba(10, 10, 10, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(188, 150, 160, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f5e6ea, #bc96a0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 48px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--rose-primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--rose-primary);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .fade-up {
+            opacity: 0;
+            transform: translateY(45px);
+            transition: opacity 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.9s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .fade-up.visible, .fade-left.visible, .fade-right.visible, .scale-in.visible {
+            opacity: 1;
+            transform: translateY(0) translateX(0) scale(1);
+        }
+
+        .fade-left {
+            opacity: 0;
+            transform: translateX(-35px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-right {
+            opacity: 0;
+            transform: translateX(35px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .scale-in {
+            opacity: 0;
+            transform: scale(0.96);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .btn-primary {
+            background: var(--rose-primary);
+            color: #0a0a0a;
+            font-weight: 700;
+            padding: 14px 36px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 18px rgba(188, 150, 160, 0.3);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-primary:hover {
+            background: #e2c0cb;
+            transform: translateY(-3px);
+            box-shadow: 0 14px 30px rgba(188, 150, 160, 0.45);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--rose-primary);
+            color: var(--rose-primary);
+            font-weight: 600;
+            padding: 12px 32px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-outline:hover {
+            background: var(--rose-primary);
+            color: #0a0a0a;
+            transform: scale(1.02);
+        }
+
+        .hero {
+            padding: 110px 0 90px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 5.2rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 28px;
+            line-height: 1.1;
+        }
+
+        .hero .highlight-rose {
+            color: var(--rose-primary);
+            text-shadow: 0 0 20px rgba(188, 150, 160, 0.4);
+        }
+
+        .hero .tagline {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 700px;
+            margin: 0 auto 42px;
+        }
+
+        .description-section {
+            background: linear-gradient(145deg, #111111, #0c0c0c);
+            border-radius: 56px;
+            padding: 60px 52px;
+            margin: 40px 0;
+            border: 1px solid #282828;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.6);
+        }
+
+        .ghost-badge {
+            display: inline-block;
+            background: rgba(188, 150, 160, 0.12);
+            color: var(--rose-primary);
+            border-radius: 100px;
+            padding: 6px 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 28px;
+            backdrop-filter: blur(4px);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 48px;
+            margin: 56px 0;
+        }
+
+        .pricing-card {
+            background: #131313;
+            border-radius: 38px;
+            padding: 2.2rem 2rem;
+            border: 1px solid #2a2a2a;
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .pricing-card:hover {
+            border-color: var(--rose-primary);
+            transform: translateY(-10px);
+        }
+
+        .card-lite {
+            background: linear-gradient(135deg, #171717, #101010);
+        }
+
+        .card-x {
+            background: linear-gradient(135deg, #1c1518, #100e0f);
+        }
+
+        .badge-soon {
+            background: rgba(188, 150, 160, 0.2);
+            color: var(--rose-primary);
+            font-size: 0.7rem;
+            border-radius: 40px;
+            padding: 5px 16px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .price {
+            font-size: 3.3rem;
+            font-weight: 800;
+            color: white;
+            margin: 20px 0 8px;
+        }
+
+        .price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #a5a5a5;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 32px 0;
+        }
+
+        .feature-list li {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.92rem;
+            font-weight: 500;
+        }
+
+        .feature-list li svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--rose-primary);
+            stroke-width: 2;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        .feature-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            justify-content: center;
+            margin: 70px 0 50px;
+        }
+
+        .feature-card {
+            flex: 1;
+            min-width: 240px;
+            background: #121212;
+            border-radius: 32px;
+            padding: 36px 24px;
+            text-align: center;
+            border: 1px solid #262626;
+            transition: all 0.35s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--rose-primary);
+            background: #181818;
+        }
+
+        .feature-card svg {
+            width: 56px;
+            height: 56px;
+            stroke: var(--rose-primary);
+            stroke-width: 1.5;
+            fill: none;
+            margin-bottom: 22px;
+        }
+
+        .feature-card h3 {
+            margin: 18px 0 12px;
+            color: #bc96a0;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .faq-item {
+            background: #111;
+            border-radius: 28px;
+            padding: 24px 34px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--rose-primary);
+        }
+
+        .faq-item h3 {
+            color: #bc96a0;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        .footer {
+            border-top: 1px solid #262626;
+            margin-top: 100px;
+            padding: 52px 0 48px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 52px;
+            flex-wrap: wrap;
+            margin-bottom: 36px;
+        }
+
+        .footer-links a {
+            color: #bc96a0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .disclaimer {
+            font-size: 0.7rem;
+            max-width: 820px;
+            margin: 28px auto 0;
+            color: #6f6f6f;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 800px) {
+            .hero h1 { font-size: 2.8rem; }
+            .nav-container { flex-direction: column; height: auto; padding: 16px 20px; gap: 12px; }
+            .nav-links { gap: 32px; }
+            .description-section { padding: 36px 24px; }
+            .container { padding: 0 20px; }
+            .pricing-grid { gap: 28px; }
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 15%;
+            left: -15%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(circle, rgba(188,150,160,0.06) 0%, transparent 70%);
+            filter: blur(100px);
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<div class="full-width-nav">
+    <div class="nav-container">
+        <div class="logo">AMETHYST</div>
+        <div class="nav-links">
+            <a href="#" data-nav="home">Главная</a>
+            <a href="#" data-nav="pricing">Тарифы</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="hero fade-up" id="home">
+        <h1>Хватит <span class="highlight-rose">потеть</span>.<br>Начни <span class="highlight-rose">побеждать</span>.</h1>
+        <p class="tagline">Amethyst — Ghost Client для Minecraft 1.8.9. Абсолютная скрытность, интеллектуальные модули и полный контроль над игрой.</p>
+        <button class="btn-primary" id="scrollToPricingBtn">К тарифам →</button>
+    </div>
+
+    <div class="description-section fade-up">
+        <div class="ghost-badge">INTERNAL GHOST CLIENT</div>
+        <h2 style="font-size: 2.3rem; margin-bottom: 22px; color: #fff;">Amethyst Core — архитектура превосходства</h2>
+        <p style="font-size: 1.05rem; color: #c4c4c4; max-width: 90%; margin-bottom: 34px;">
+            Разработан для самых требовательных PvP-сражений. Инжектируемый клиент с минимальным следом, 
+            продвинутой системой обхода античитов. AimAssist, Reach, Velocity, 
+            Scaffold, ESP и десятки других функций — всё это работает незаметно и стабильно на версии 1.8.9.
+            Amethyst даёт тебе не просто преимущество, а полную свободу в игре.
+        </p>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <span style="background: #232323; padding: 7px 20px; border-radius: 40px; font-size: 0.8rem; font-weight: 500;">Undetectable</span>
+            <span style="background: #232323; padding: 7px 20px; border-radius: 40px; font-size: 0.8rem; font-weight: 500;">Ghost Modules</span>
+            <span style="background: #232323; padding: 7px 20px; border-radius: 40px; font-size: 0.8rem; font-weight: 500;">Best Bypasses</span>
+        </div>
+    </div>
+
+    <div id="pricing">
+        <div style="text-align: center; margin-bottom: 36px;" class="fade-up">
+            <span style="background: rgba(188,150,160,0.2); padding: 6px 24px; border-radius: 40px; font-size: 0.75rem; font-weight: 600; color: #bc96a0;">ТАРИФЫ</span>
+            <h2 style="font-size: 2.6rem; margin-top: 18px; color: white;">Выбери свой Amethyst</h2>
+        </div>
+
+        <div class="pricing-grid">
+            <!-- Amethyst Lite -->
+            <div class="pricing-card card-lite fade-left">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h3 style="font-size: 1.9rem; color: #fff; font-weight: 700;">Amethyst Lite</h3>
+                    <span class="badge-soon">Доступен</span>
+                </div>
+                <div class="price">₽500<span> / lifetime</span></div>
+                <p style="color: #bc96a0; font-size: 0.85rem; font-weight: 500;">Регулярные обновления</p>
+                <ul class="feature-list">
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Все Ghost-модули</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Красивый дизайн</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Обход проверок</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Поддержка Lunar client</li>      
+                </ul>
+                <button class="btn-primary" style="width: 100%; justify-content: center;" data-buy-lite>Приобрести</button>
+            </div>
+
+            <!-- Amethyst X -->
+            <div class="pricing-card card-x fade-right">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h3 style="font-size: 1.9rem; color: #fff; font-weight: 700;">Amethyst X</h3>
+                    <span class="badge-soon" style="background: rgba(188,150,160,0.25);">Скоро</span>
+                </div>
+                <div class="price">₽1000<span> / lifetime</span></div>
+                <p style="color: #bc96a0; font-size: 0.85rem; font-weight: 500;"></p>
+                <ul class="feature-list">
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Поддержка modern версий</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Регулярные обновления</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Поддержка Fabric, Lunar</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Премиум фичи с вашими иконками -->
+    <div class="feature-grid">
+        <!-- Стабильность → звезда -->
+        <div class="feature-card scale-in">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polygon points="12 2 15 8.5 22 9.5 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9.5 9 8.5 12 2"/>
+            </svg>
+            <h3>Стабильность</h3>
+            <p>Максимальная производительность без лагов</p>
+        </div>
+
+        <!-- Премиальный дизайн → ваша иконка с кружками (дружелюбный дизайн) -->
+        <div class="feature-card scale-in" style="transition-delay: 0.1s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="13.5" cy="6.5" r=".5" />
+                <circle cx="17.5" cy="10.5" r=".5" />
+                <circle cx="8.5" cy="7.5" r=".5" />
+                <circle cx="6.5" cy="12.5" r=".5" />
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+            </svg>
+            <h3>Премиальный дизайн</h3>
+            <p>Эстетичный интерфейс с плавными анимациями</p>
+        </div>
+
+        <!-- Понятный интерфейс → иконка user (человек) -->
+        <div class="feature-card scale-in" style="transition-delay: 0.2s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <h3>Понятный интерфейс</h3>
+            <p>Разберётся даже новичок за 5 минут</p>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <div id="faq-section" style="margin: 60px 0 40px;">
+        <div style="text-align: center; margin-bottom: 52px;" class="fade-up">
+            <h2 style="font-size: 2.3rem; color: white;">Часто спрашивают</h2>
+            <p style="color: #aaa;">Всё, что нужно знать о Amethyst Client</p>
+        </div>
+        <div class="faq-item fade-left">
+            <h3>Безопасен ли Amethyst для моего аккаунта Minecraft?</h3>
+            <p>Да. Мы не запрашиваем ваш пароль от Minecraft, не храним личные данные и не передаём их третьим лицам.</p>
+        </div>
+        <div class="faq-item fade-right">
+            <h3>Какие версии Minecraft поддерживаются?</h3>
+            <p>Основная версия — 1.8.9, идеально для Hypixel, Minemen и других PvP серверов.</p>
+        </div>
+        <div class="faq-item fade-left">
+            <h3>Могу ли я использовать Amethyst на нескольких ПК?</h3>
+            <p>Лицензия привязана к одному активному HWID. Вы можете использовать клиент только на одном компьютере. При смене устройства доступен сброс HWID в личном кабинете.</p>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <div class="footer">
+        <div class="footer-links">
+            <a href="#" id="termsLink">Условия использования</a>
+            <a href="#" id="privacyLink">Политика конфиденциальности</a>
+        </div>
+        <p style="margin-bottom: 14px;">© 2026 Amethyst Client — инструмент для побед.</p>
+        <div class="disclaimer">
+            <strong>НЕ ОДОБРЕНО MOJANG</strong> — Данный продукт не связан с Mojang Studios, Microsoft или официальным Minecraft. 
+            Использование клиента на серверах, запрещающих модификации, может привести к блокировке аккаунта. 
+            Amethyst не несёт ответственности за санкции со стороны администрации серверов.
+        </div>
+    </div>
+</div>
+
+<!-- Модалки -->
+<div id="termsModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.94); backdrop-filter: blur(12px); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: #151515; max-width: 620px; width: 90%; border-radius: 36px; border: 1px solid #bc96a0; padding: 40px; max-height: 80vh; overflow-y: auto;">
+        <h2 style="color: #bc96a0; margin-bottom: 28px;">Условия использования</h2>
+        <p style="margin-bottom: 20px;">1. Запрещена передача доступа к лицензии третьим лицам. Лицензия является строго персональной и не подлежит передаче, продаже или обмену.</p>
+        <p style="margin-bottom: 20px;">2. Любые попытки реверс-инжиниринга, декомпиляции, дизассемблирования или модификации клиента Amethyst строго запрещены и влекут за собой немедленную блокировку лицензии без права возврата средств.</p>
+        <p style="margin-bottom: 20px;">3. Использование клиента на серверах, где читерство запрещено, осуществляется на ваш страх и риск.</p>
+        <p style="margin-bottom: 20px;">4. Запрещено распространять, копировать или передавать исполняемые файлы клиента.</p>
+        <p style="margin-bottom: 30px;">5. Нарушение любого из пунктов влечёт бессрочную блокировку аккаунта без возмещения стоимости.</p>
+        <button class="btn-outline" id="closeTerms">Закрыть</button>
+    </div>
+</div>
+
+<div id="privacyModal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.94); backdrop-filter: blur(12px); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: #151515; max-width: 620px; width: 90%; border-radius: 36px; border: 1px solid #bc96a0; padding: 40px; max-height: 80vh; overflow-y: auto;">
+        <h2 style="color: #bc96a0; margin-bottom: 28px;">Политика конфиденциальности</h2>
+        <p style="margin-bottom: 20px;">Amethyst Client собирает минимально необходимую информацию: HWID для привязки лицензии, email для связи, и анонимную статистику использования модулей.</p>
+        <p style="margin-bottom: 20px;">Мы не передаём данные третьим лицам. Конфигурации хранятся в зашифрованном виде.</p>
+        <p style="margin-bottom: 20px;">Любая попытка несанкционированного доступа к инфраструктуре Amethyst преследуется.</p>
+        <p style="margin-bottom: 30px;">Продолжая использовать Amethyst, вы подтверждаете согласие с данной политикой.</p>
+        <button class="btn-outline" id="closePrivacy">Закрыть</button>
+    </div>
+</div>
+
+<script>
+    const animatedElements = document.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.15 });
+    animatedElements.forEach(el => observer.observe(el));
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const navId = link.getAttribute('data-nav');
+            if(navId === 'home') document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
+            if(navId === 'pricing') document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    document.getElementById('scrollToPricingBtn').addEventListener('click', () => {
+        document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    const buyBtns = document.querySelectorAll('[data-buy-lite]');
+    buyBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            window.open('https://t.me/Amethystghost', '_blank');
+        });
+    });
+
+    const termsModal = document.getElementById('termsModal');
+    const privacyModal = document.getElementById('privacyModal');
+    const termsLink = document.getElementById('termsLink');
+    const privacyLink = document.getElementById('privacyLink');
+    const closeTerms = document.getElementById('closeTerms');
+    const closePrivacy = document.getElementById('closePrivacy');
+
+    termsLink.addEventListener('click', (e) => { e.preventDefault(); termsModal.style.display = 'flex'; });
+    privacyLink.addEventListener('click', (e) => { e.preventDefault(); privacyModal.style.display = 'flex'; });
+    closeTerms.addEventListener('click', () => { termsModal.style.display = 'none'; });
+    closePrivacy.addEventListener('click', () => { privacyModal.style.display = 'none'; });
+    window.addEventListener('click', (e) => {
+        if(e.target === termsModal) termsModal.style.display = 'none';
+        if(e.target === privacyModal) privacyModal.style.display = 'none';
+    });
+</script>
+</body>
+</html>
